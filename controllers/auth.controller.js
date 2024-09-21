@@ -33,8 +33,6 @@ async function login(req, res) {
       }
     );
 
-    res.cookie("token", token, {});
-
     res
       .cookie("token", token, {
         httpOnly: true,

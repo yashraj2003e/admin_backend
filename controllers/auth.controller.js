@@ -21,7 +21,7 @@ async function login(req, res) {
       return;
     }
 
-    const age = 10000 * 60 * 60 * 24 * 7;
+    const age = 1000 * 60 * 60 * 24 * 7;
 
     const token = jwt.sign(
       {

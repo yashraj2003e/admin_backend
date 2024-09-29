@@ -29,7 +29,7 @@ async function getCartItems(req, res) {
 async function addToCart(req, res) {
   try {
     const userId = req.userId;
-    const { productId, quantity } = req.body;
+    const { productId, quantity, operation } = req.body;
 
     if (!productId || !quantity) {
       return res
@@ -55,6 +55,19 @@ async function addToCart(req, res) {
     });
 
     if (existingCartItem) {
+      if (operation != "add" && existingCartItem.quantity - 1 < 0) {
+        await Prisma.cart.delete({
+          where: {
+            userId_productId: {
+              userId: userId,
+              productId: productId,
+            },
+          },
+        });
+        res.status(200).json({ message: "Item deleted Successfully !" });
+        return;
+      }
+
       const updatedCartItem = await Prisma.cart.update({
         where: {
           userId_productId: {
@@ -63,7 +76,10 @@ async function addToCart(req, res) {
           },
         },
         data: {
-          quantity: existingCartItem.quantity + quantity,
+          quantity:
+            operation === "add"
+              ? existingCartItem.quantity + quantity
+              : existingCartItem.quantity - 1,
         },
       });
 
